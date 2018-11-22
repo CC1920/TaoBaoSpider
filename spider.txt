@@ -1,0 +1,104 @@
+1   爬一个店铺所有商品的信息：
+    每一个商品，每一个商品的名字，价格， 销量  评价， 图片
+	
+2.  搜索某一个东西，爬取这个东西所有的： 名字 价格， 销量， 店铺， 地址
+	相对来说，这个简单，可以先来爬这个，完了再试上面的
+
+3   可以考虑使用分布式爬虫，我加上我同学的有三个服务器
+
+下来开始，从分析Url 开始：
+
+# 这是第一页的url:
+https://s.taobao.com/search?q=%E8%BE%A3%E6%9D%A1&
+imgfile=&
+commend=all&
+ssid=s5-e&
+search_type=item&
+sourceId=tb.index&
+spm=a21bo.2017.201856-taobao-item.1&
+ie=utf8&initiative_id=tbindexz_20170306&
+bcoffset=9&
+ntoffset=9&
+p4ppushleft=1%2C48
+&s=0
+
+# 这是第二页的url:
+https://s.taobao.com/search?q=%E8%BE%A3%E6%9D%A1&
+imgfile=&
+commend=all&ssid=s5-e&search_type=item&
+sourceId=tb.index&
+spm=a21bo.2017.201856-taobao-item.1&
+ie=utf8&initiative_id=tbindexz_20170306&
+bcoffset=3&
+ntoffset=3&
+p4ppushleft=1%2C48
+&s=44
+
+
+
+# 这是第五页的url 
+https://s.taobao.com/search?q=%E8%BE%A3%E6%9D%A1&
+imgfile=&
+commend=all&
+ssid=s5-e&
+search_type=item&
+sourceId=tb.index&
+spm=a21bo.2017.201856-taobao-item.1&
+ie=utf8&
+initiative_id=tbindexz_20170306&
+bcoffset=-3&
+ntoffset=-3&
+p4ppushleft=1%2C48
+&s=176
+
+
+# 这是第七页的url 
+https://s.taobao.com/search?q=%E8%BE%A3%E6%9D%A1&
+imgfile=&
+commend=all&
+ssid=s5-e&
+search_type=item&
+sourceId=tb.index&
+spm=a21bo.2017.201856-taobao-item.1&
+ie=utf8&
+initiative_id=tbindexz_20170306&
+bcoffset=-9&
+ntoffset=-9&
+p4ppushleft=1%2C48&		
+s=264
+ 
+# q 后面跟的是搜索的东西
+
+# 经过分析， 得出结论，翻页只跟最后这个数字有关，这个数字是每页显示商品的个数，为44
+# 翻页的话， 为44的倍数。第一页是 0 第二页是 44 第三页是 88 ....
+# 每件商品都显示100页 所以最大值是4400
+# 可以考虑 只设置两个参数： 搜索的东西， 搜索的页数（一页44个商品）
+
+# 本来打算分析淘宝JS, 模拟登录的，
+# 我原来以为它不就是把我的账号密码经过一系列的加密规则，传递到后端，
+# 他的加密规则就是前端的JS，我们也可以看到
+# 但是困难远比想象的要多，首先淘宝这些人，真的骚，变量名全是abcdefg
+# 这跟武侠小说的顶级高手一样，武功到了最高反而跟开始练武时一样了
+# 不扯了，什么rsa加密，ua 加密，还是很难的
+# 所以暂时确定使用selenium 模拟登录
+# 爬取上面列出的所有的东西
+
+# 2018-11-21- 17:50
+# 使用selenium 模拟登录，账号密码好输入，发现滑块拖动可以通过改变
+# 但是它的div 是隐藏的，必须改变style: left 258 来实现滑块拖到右边
+
+# 2018-11-21- 19:20
+# 现在测试模拟 拖动滑动条 
+
+# 2018-11-21 20: 00
+# 滑动条可以动，但是不能拖过去，怀疑是拖的太快了，现在尝试缓慢拖动（利用时间延时）
+
+# 2018-11-21 20:10
+# 模拟登录到就是手动拖动滑动条也不行了，现在在尝试用微博登录\支付宝登录\
+
+# 2018-11-21 20:50
+# 三种登录都尝试过了，明天应该可以，今晚暂时先用cookie 登录爬取需要的信息
+
+# 208-11-22 9:40
+# 网上查了查，淘宝好像有这个 '模拟滑动操作' 的检测机制，
+# 支付宝登录也有滑动条，微博登录要验证码
